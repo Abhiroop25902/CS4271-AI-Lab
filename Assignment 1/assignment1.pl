@@ -5,8 +5,7 @@ first_two_same([X|[X|_]]).
 % 2. To determine whether a list is not a two-element list.
 not_two_element_list([]).
 not_two_element_list([_]).
-% not_two_element_list([_, _, _]).
-not_two_element_list([_, _, [_ | _]]).
+not_two_element_list([_|[_|[_ | _]]]).
 
 % 3. To determine whether two lists are of same length.
 equal_length([],[]).
