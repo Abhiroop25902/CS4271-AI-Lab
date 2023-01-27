@@ -113,16 +113,29 @@ gcd_two_num(X,Y,G) :- X>Y ,gcd_two_num(Y,X,G).
 % divisible(X, Y), X is divisible by Y
 divisible(X,Y) :- 0 is X mod Y, !.
 divisible(X,Y) :- X > Y+1, divisible(X, Y+1).
+
+prime_loop(X, Curr):-
+    Curr = X, !.
+
+prime_loop(X, Curr):-
+    Curr < X, 
+    not(divisible(X, Curr)),
+    NextCurr is Curr + 1,
+    prime_loop(X, NextCurr), !.
+
 % is_prime(X) -> true if X is prime
-is_prime(2) :- true,!.
+is_prime(2) :- true, !.
 is_prime(X) :- X < 2,!,false.
-is_prime(X) :- not(divisible(X, 2)).
+
+is_prime(X) :- 
+    prime_loop(X, 2).
 
 % 20. To determine whether two positive integer numbers are co-prime.
 % coprime(X, Y) -> true if X and Y are coprime
 coprime(X, Y):-
     gcd_two_num(X, Y, 1).
 
+% TODO: understand what this shit does
 % 21. To determine the prime factors of a given positive integer.
 prime_factors(N, L) :-
     findall(D, prime_factor(N, D), L).
