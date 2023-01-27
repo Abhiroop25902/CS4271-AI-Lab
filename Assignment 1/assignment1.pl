@@ -112,7 +112,6 @@ gcd_two_num(X,Y,G) :- X>Y ,gcd_two_num(Y,X,G).
 % 19. To determine whether a given integer number is prime.
 % divisible(X, Y), X is divisible by Y
 divisible(X,Y) :- 0 is X mod Y, !.
-divisible(X,Y) :- X > Y+1, divisible(X, Y+1).
 
 prime_loop(X, Curr):-
     Curr = X, !.
@@ -135,22 +134,27 @@ is_prime(X) :-
 coprime(X, Y):-
     gcd_two_num(X, Y, 1).
 
-% TODO: understand what this shit does
 % 21. To determine the prime factors of a given positive integer.
-prime_factors(N, L) :-
-    findall(D, prime_factor(N, D), L).
+find_smallest_prime_loop(X, Curr, P):-
+    is_prime(Curr), 
+    divisible(X, Curr),  
+    P is Curr, !.
 
-prime_factor(N, D) :-
-    find_prime_factor(N, 2, D).
+find_smallest_prime_loop(X, Curr, P):-
+    NextCurr is Curr + 1,
+    find_smallest_prime_loop(X, NextCurr, P).
 
-find_prime_factor(N, D, D) :-
-    0 is N mod D.
-find_prime_factor(N, D, R) :-
-    D < N,
-    (0 is N mod D
-    -> (N1 is N/D, find_prime_factor(N1, D, R))
-    ;  (D1 is D + 1, find_prime_factor(N, D1, R))
-    ).
+% X is not a prime number
+find_smallest_prime_divisor(X, P):-
+    find_smallest_prime_loop(X, 2, P). 
+
+prime_factors(X, [X]):-
+    is_prime(X).
+prime_factors(X, L):-
+    find_smallest_prime_divisor(X, P),
+    Rem is X/P,
+    prime_factors(Rem, L1),
+    append_two_list(L1, [P], L).
 
 % 22. Goldbach's conjecture.
 % goldbach(X, L)-> L is a list of two prime numbers whose sum is X
