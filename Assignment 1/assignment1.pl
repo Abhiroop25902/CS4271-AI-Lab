@@ -33,6 +33,7 @@ last_element([_ | [B |L1]], X):-
 
 % 7. To find whether an element is a member of a list.
 is_member(X, [X]).
+is_member(X, [X | _]).
 is_member(X, [_ | Rest]):-
     is_member(X, Rest).
 
