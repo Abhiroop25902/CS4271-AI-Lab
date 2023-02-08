@@ -1,4 +1,3 @@
-% 1. To add an element to a list provided it is not present in the list.
 
 /**
  *
@@ -16,6 +15,18 @@ append_two_list([], L2, L2).
 append_two_list([X|L1], L2, [X|L3]):-
     append_two_list(L1, L2, L3).
 
+lengthacc([], A, A).
+
+lengthacc([_|T], A, M):-
+    A1 is A + 1,
+    lengthacc(T, A1, M).
+
+% length of list L is N
+list_len(L, N):-
+    lengthacc(L, 0, N).
+
+
+% 1. To add an element to a list provided it is not present in the list.
 % add_if_not_present(X, L, R) -> add X to L and return it in R,
 add_if_not_present(X, [], [X]).
 add_if_not_present(X, L, L):-
@@ -107,7 +118,7 @@ is_sublist([], _).
 is_sublist([X|L], [X|M]):-
     prefix(L, M), !.
 
-is_sublist([X|L], [Y|M]):-
+is_sublist([X|L], [_|M]):-
     is_sublist([X|L], M).
 
 % 9. To determine whether a set is a subset of another set.
@@ -169,3 +180,97 @@ element_at(X, [X|_], 1).
 element_at(X, [_|L], N):-
     N_minus_1 is N - 1,
     element_at(X, L, N_minus_1).
+
+% 17. To replace n th element by another element X in L, 
+% leaving the resultant list in L1.
+% replace_n(L, N, X, L1) -> L1 will have same elements as L,
+% but every Nth term will be X
+
+replace_n_loop([], _, _, [], _).
+
+replace_n_loop([_|Rest], N, X, [X|L2],Curr):-
+    Curr = N , !,
+    replace_n_loop(Rest, N, X, L2, 1).
+
+replace_n_loop([A|Rest], N, X, [A|L2],Curr):-
+    NextCurr is Curr + 1,
+    replace_n_loop(Rest, N, X, L2, NextCurr).
+
+replace_n(L, N, X, L1):- 
+    replace_n_loop(L, N, X, L1,1).
+
+% 18. to remove every N'th element from a list.
+% remove_n(L, N, L1) -> L1 will have elements of L but every 
+% nth element removed
+
+remove_n_loop([], _, [], _).
+
+remove_n_loop([_|Rest], N, L2,Curr):-
+    Curr = N , !,
+    remove_n_loop(Rest, N, L2, 1).
+
+remove_n_loop([A|Rest], N, [A|L2],Curr):-
+    NextCurr is Curr + 1,
+    remove_n_loop(Rest, N, L2, NextCurr).
+
+remove_n(L, N, L1):-
+    remove_n_loop(L,N, L1, 1).
+
+% 19. Interleave alternate elements of L1 and L2 into L. 
+% For example, if L1= [a, b, c] and L2= [1, 2], then L= [a, 1, b, 2, c].
+
+% 0 means take from L1, else L2
+interleave_two_list_loop([], L2, L2,_).
+interleave_two_list_loop(L1, [], L1,_).
+
+interleave_two_list_loop([X|L1], [Y|L2], [X|L3],0):-
+    interleave_two_list_loop(L1, [Y|L2], L3,1).
+
+interleave_two_list_loop([X|L1], [Y|L2], [Y|L3],1):-
+    interleave_two_list_loop([X|L1], L2, L3,0).
+
+% interleave_two_list(L1, L2, Res) -> Res is the result
+interleave_two_list(L1, L2, Res):-
+    interleave_two_list_loop(L1, L2, Res, 0).
+
+%20.Transpose L1, L2 into L. That is, if L1= [a, b, c] and 
+% L2= [1, 2, 3], then L= [(a, 1), (b, 2), (c,3)].
+
+% transpose_two_list(L1, L2, Res) -> valid only if length of L1 = L2
+transpose_two_list([], [], []).
+
+transpose_two_list([A|L1], [B|L2], [(A, B)|Rest]):-
+    list_len(L1, X),
+    list_len(L2, X),
+    transpose_two_list(L1, L2, Rest).
+
+% 21. To split a list into two parts; the length of the first part is given.
+% Do not use any predefined predicates.
+
+% split_two_parts(L, N, Left, Right) -> 
+% Left will be first N elements of L
+% rest elements will be in Right
+
+% N should be less than lenght of List
+split_two_parts(L, 0, [], L).
+
+split_two_parts([X|L], N, [X|Left], Right):-
+    list_len([X|L], ListLen),
+    N =< ListLen, 
+    N_minus_1 is N - 1,
+    split_two_parts(L, N_minus_1, Left, Right).
+
+% 22. To extract a slice from a list.
+% Given two indices, I and K, the slice is the list containing the elements between the
+% I'th and K'th element of the original list (both limits included). Start counting the
+% elements with 1.
+% Example:
+% ?- slice([a,b,c,d,e,f,g,h,i,k],3,7,L).
+% {X = [c,d,e,f,g]}
+
+slice(L1, LeftStart, RightEnd, Res):-
+    LeftExtraLen is LeftStart - 1,
+    split_two_parts(L1, LeftExtraLen, LeftExtra, Res_plus_extra),
+    LeftStart =< RightEnd,
+    ResLen is RightEnd - LeftStart + 1,
+    split_two_parts(Res_plus_extra, ResLen, Res, RightExtra).
