@@ -328,3 +328,68 @@ trim(N, L, L1):-
 trimlast(N, L, L1):-
     append_two_list(L1, RightExtra, L),
     list_len(RightExtra, N).
+
+% 28.exchange_first_last(L, L1), defines that L1 to be obtained 
+% from L with first and last elements exchanged.
+% Example:
+% ?-exchange_first_last([a, b, c, d, e], X).
+% {X= [e, b, c, d, a]}
+exchange_first_last([X|T], [Y|L1]):-
+    append_two_list(Rest, [Y], T),
+    append_two_list(Rest, [X], L1).
+
+% 29 circular_left_shift(L, L1). That is, if L= [a, b, c, d, e, f] 
+% then L1= [b, c, d, e, f, a]
+circular_left_shift([X|L], L1):-
+    append_two_list(L, [X], L1).
+
+% 30. circular_right_shift(L, L1). That is, if L= [a, b, c, d, e, f] 
+% then L1= [f, a, b, c, d, e]
+circular_right_shift(L, [Y|L1]):-
+    append_two_list(L1, [Y], L).
+
+% [Try using circular_left_shift in 30 to implement circular_right_shift.]
+circular_right_shift_2_loop(L, L, 0).
+
+circular_right_shift_2_loop(L, L1, Curr):-
+    circular_left_shift(L, L2),
+    Curr_minus_1 is Curr - 1,
+    circular_right_shift_2_loop(L2, L1, Curr_minus_1).
+
+circular_right_shift_1(L, L1):-
+    list_len(L, L_len),
+    L_len_minus_1 is L_len - 1,
+    circular_right_shift_2_loop(L, L1, L_len_minus_1).
+
+% 31.To delete the middle element from an odd-numbered list 
+% L into a list L1.
+
+delete_middle_element_odd_length_loop([_|T], T, 0).
+
+delete_middle_element_odd_length_loop([H|T], [H|L1], MiddleIndex):-
+    MiddleIndex_minus_1 is MiddleIndex - 1,
+    delete_middle_element_odd_length_loop(T, L1, MiddleIndex_minus_1).
+
+
+delete_middle_element_odd_length(L, L1):-
+    list_len(L, L_len),
+    L_len_mod_2 is L_len mod 2,
+    L_len_mod_2 = 1,
+    MiddleIndex is (L_len-1)/2,
+    delete_middle_element_odd_length_loop(L, L1, MiddleIndex).
+
+% 32.To delete two middle elements from an even-numbered list 
+% L into a list L1.
+
+delete_middle_element_even_length(L, L1):-
+    list_len(L, L_len),
+    L_len_mod_2 is L_len mod 2,
+    L_len_mod_2 = 0,
+    MiddleIndex is L_len/2 - 1,
+    delete_middle_element_even_length_loop(L, L1, MiddleIndex).
+
+delete_middle_element_even_length_loop([_|[_|T]], T, 0).
+
+delete_middle_element_even_length_loop([H|T], [H|L1], MiddleIndex):-
+    MiddleIndex_minus_1 is MiddleIndex - 1,
+    delete_middle_element_even_length_loop(T, L1, MiddleIndex_minus_1).
