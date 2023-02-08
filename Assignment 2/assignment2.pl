@@ -91,10 +91,24 @@ duplicate_n([X|L], N, Res):-
 % A list is a sub list of another list if it’s elements are 
 % present in another list consecutively and in the same order.
 
+prefix([], _).
+prefix([X|L], [X|M]):-
+    prefix(L, M).
+
 %% is_sublist(L1, L2) return true if L1 is a sublist of L2
-is_sublist(L1, L2):-
-    append_two_list(_, L1, L3),
-    append_two_list(L3, _, L2).
+% NOTE: giving error
+% is_sublist(L1, L2):-
+%     append_two_list(_, L1, L3),
+%     append_two_list(L3, _, L2).
+
+% empty list is a sublist of any list
+is_sublist([], _).
+
+is_sublist([X|L], [X|M]):-
+    prefix(L, M), !.
+
+is_sublist([X|L], [Y|M]):-
+    is_sublist([X|L], M).
 
 % 9. To determine whether a set is a subset of another set.
 %% is_subset(S1, S2) return true if S1 is a subset of S2
