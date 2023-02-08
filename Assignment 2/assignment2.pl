@@ -25,6 +25,13 @@ lengthacc([_|T], A, M):-
 list_len(L, N):-
     lengthacc(L, 0, N).
 
+% range(Low, High, Res) -> Res is [Low, Low+1, ..., High]
+range(High, High, [High]).
+range(Low, High, [Low|L1]):-
+    Low =< High,
+    Low_plus_1 is Low + 1,
+    range(Low_plus_1, High, L1).
+
 
 % 1. To add an element to a list provided it is not present in the list.
 % add_if_not_present(X, L, R) -> add X to L and return it in R,
@@ -261,16 +268,63 @@ split_two_parts([X|L], N, [X|Left], Right):-
     split_two_parts(L, N_minus_1, Left, Right).
 
 % 22. To extract a slice from a list.
-% Given two indices, I and K, the slice is the list containing the elements between the
-% I'th and K'th element of the original list (both limits included). Start counting the
-% elements with 1.
+% Given two indices, I and K, the slice is the list containing 
+% the elements between the I'th and K'th element of the 
+% original list (both limits included). 
+% Start counting the elements with 1.
 % Example:
 % ?- slice([a,b,c,d,e,f,g,h,i,k],3,7,L).
 % {X = [c,d,e,f,g]}
 
 slice(L1, LeftStart, RightEnd, Res):-
     LeftExtraLen is LeftStart - 1,
-    split_two_parts(L1, LeftExtraLen, LeftExtra, Res_plus_extra),
+    split_two_parts(L1, LeftExtraLen, _, Res_plus_extra),
     LeftStart =< RightEnd,
     ResLen is RightEnd - LeftStart + 1,
-    split_two_parts(Res_plus_extra, ResLen, Res, RightExtra).
+    split_two_parts(Res_plus_extra, ResLen, Res, _).
+
+% 23. To insert an element at a given position into a list.
+% Example:
+% ?- insert_at(alfa,[a,b,c,d],2,L).
+% {L = [a,alfa,b,c,d]}
+
+% insert_at(X, L, N, Res) -> N is 1 indexed
+insert_at(X, [Head|Tail], 1, [X|[Head|Tail]]).
+
+insert_at(X, [Head|Tail], N, [Head|Res]):-
+    N_minus_1 is N - 1,
+    insert_at(X, Tail, N_minus_1, Res).
+
+% 24. To remove_every_other (L, L1). List L1 is just list L 
+% with every other element removed
+% (the two lists should have the same first element).
+
+% 0 means keep, 1 means remove
+remove_every_other_loop([X|L], [X|L1], 0):-
+    remove_every_other_loop(L, L1, 1).
+
+remove_every_other_loop([_|L], L1, 1):-
+    remove_every_other_loop(L, L1, 0).
+
+remove_every_other_loop([], [], _).
+
+remove_every_other(L, L1):-
+    remove_every_other_loop(L, L1, 0).
+
+
+% 25. cutlast (L, L1) that defines L1 to be obtained from L 
+% with last element removed.
+cutlast(L, L1):-
+    append_two_list(L1, [_], L).
+
+% 26. trim (N, L, L1) that defines L1 to be obtained from L 
+% with first N elements removed
+trim(N, L, L1):-
+    append_two_list(LeftExtra, L1, L),
+    list_len(LeftExtra, N).
+
+% 27.trimlast (N, L, L1) that defines L1 to be obtained from 
+% L with last N elements removed.
+trimlast(N, L, L1):-
+    append_two_list(L1, RightExtra, L),
+    list_len(RightExtra, N).
