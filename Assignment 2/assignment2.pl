@@ -40,6 +40,12 @@ add_if_not_present(X, L, L):-
     is_member(X, L), !.
 add_if_not_present(X, L, [X|L]).
 
+% ?- add_if_not_present(1, [2,3,4], X).
+% X = [1, 2, 3, 4].
+
+% ?- add_if_not_present(1, [2,1,3,4], X).
+% X = [2, 1, 3, 4].
+
 % 2. To delete first occurrence of an element from a list.
 % delete_first_occur(X, L, R) -> R is the result
 delete_first_occur(_, [], []).
@@ -47,12 +53,26 @@ delete_first_occur(X, [X| L], L):- !.
 delete_first_occur(X, [Y|L], [Y|L1]):-
     delete_first_occur(X, L, L1).
 
+% ?- delete_first_occur(1, [2,3], X).
+% X = [2, 3] 
+
+% ?- range(1, 100, X), delete_first_occur(2, X, Y).
+% X = [1, 2, 3, 4, 5, 6, 7, 8, 9|...],
+% Y = [1, 3, 4, 5, 6, 7, 8, 9, 10|...] 
+
 % 3. To delete all occurrences of an element from a list.
 delete_all_occur(_, [], []).
 delete_all_occur(X, [X|L], L1):-
     !, delete_all_occur(X, L, L1).
 delete_all_occur(X, [Y|L], [Y|L1]):-
     delete_all_occur(X, L, L1).
+
+% ?- delete_all_occur(1, [1,1,1,1,1], X).
+% X = [] .
+
+% ?- range(1, 100, X), delete_all_occur(2, [2|X], Y).
+% X = [1, 2, 3, 4, 5, 6, 7, 8, 9|...],
+% Y = [1, 3, 4, 5, 6, 7, 8, 9, 10|...] .
 
 % 4. To replace the first occurrence of an element X in L 
 %  with Y giving the result in R.
@@ -62,6 +82,13 @@ replace_X_with_Y(X, Y, [X|Rest], [Y|L1]):-
     !, replace_X_with_Y(X, Y, Rest, L1).
 replace_X_with_Y(X, Y, [Z|Rest], [Z|L1]):-
     replace_X_with_Y(X, Y, Rest, L1).
+
+% ?- replace_X_with_Y(1, 2, [1,2,3,4,5], X).
+% X = [2, 2, 3, 4, 5] .
+
+% ?- range(1, 100, X), replace_X_with_Y(1,2,[1|X], Y).
+% X = [1, 2, 3, 4, 5, 6, 7, 8, 9|...],
+% Y = [2, 2, 2, 3, 4, 5, 6, 7, 8|...] .
 
 % 5. has_duplicate(L), that determines whether list L has
 % duplicate elements.
