@@ -111,6 +111,13 @@ duplicate([], []).
 duplicate([X|L], [X|[X|L1]]):-
     duplicate(L, L1).
 
+% ?- duplicate([1,2,3],X).
+% X = [1, 1, 2, 2, 3, 3].
+
+% ?- range(1,4,X), duplicate(X,Y).
+% X = [1, 2, 3, 4],
+% Y = [1, 1, 2, 2, 3, 3, 4, 4] 
+
 % 7. To duplicate the elements of a list a given number of times.
 
 %% generate_n(X, N, Res) Res is the a list with X duplicated N time
@@ -131,6 +138,12 @@ duplicate_n([X|L], N, Res):-
     generate_n(X, N, X_dupli_list),
     duplicate_n(L, N, NextRes),
     append_two_list(X_dupli_list, NextRes, Res).
+
+% ?- duplicate_n([1,2,3], 3, X).
+% X = [1, 1, 1, 2, 2, 2, 3, 3, 3] .
+
+% ?- duplicate_n([1,2], 4, X).
+% X = [1, 1, 1, 1, 2, 2, 2, 2] .
 
 % 8. To determine whether a list is a sub list of another list. 
 % A list is a sub list of another list if it’s elements are 
@@ -155,11 +168,23 @@ is_sublist([X|L], [X|M]):-
 is_sublist([X|L], [_|M]):-
     is_sublist([X|L], M).
 
+% ?- is_sublist([2,3,4], [1,2,3,4,5]).
+% true.
+
+% ?- is_sublist([1,2,3,4,5], [2,3,4]).
+% false.
+
 % 9. To determine whether a set is a subset of another set.
 %% is_subset(S1, S2) return true if S1 is a subset of S2
 is_subset([], _).
 is_subset([X|L1], L2):-
     is_member(X, L2), is_subset(L1, L2).
+
+% ?- is_subset([a,b,c], [d,c,b,a]).
+% true .
+
+% ?- is_subset([a,b,c,e], [d,c,b,a]).
+% false.
 
 % 10. To determine intersection of two sets.
 %% set_intersection(S1, S2, Res) 
@@ -171,6 +196,14 @@ set_intersection([X|S1], S2, [X|S3]):-
 set_intersection([_|S1], S2, S3):-
     set_intersection(S1, S2, S3).
 
+% ?- set_intersection([a,b,c,d], [c,d,e,f], X).
+% X = [c, d].
+
+% ?- range(1,10, X), range(5, 15, Y), set_intersection(X, Y, Z).
+% X = [1, 2, 3, 4, 5, 6, 7, 8, 9|...],
+% Y = [5, 6, 7, 8, 9, 10, 11, 12, 13|...],
+% Z = [5, 6, 7, 8, 9, 10] .
+
 % 12.To determine union of two sets.
 %% set_union(S1, S2, Res) 
 % Res is the union of Set S1 and S2
@@ -180,6 +213,14 @@ set_union([X|S1], S2, S3):-
     set_union(S1, S2, S3).
 set_union([X|S1], S2, [X|S3]):-
     set_union(S1, S2, S3).
+
+% ?- set_union([1,2,3], [4], X).
+% X = [1, 2, 3, 4].
+
+% ?- range(1,3, X), range(2, 8, Y), set_union(X, Y, Z).
+% X = [1, 2, 3],
+% Y = [2, 3, 4, 5, 6, 7, 8],
+% Z = [1, 2, 3, 4, 5, 6, 7, 8] .
 
 % 13.To determine difference of two sets.
 %% set_difference(S1, S2, Res) 
@@ -192,6 +233,14 @@ set_difference([X|S1], S2, S3):-
 set_difference([X|S1], S2, [X|S3]):-
     set_difference(S1, S2, S3).
 
+% ?- set_difference([1,2,3], [2,1], X).
+% X = [3] .
+
+% ?- range(1,5, X), range(3, 8, Y), set_difference(X, Y, Z).
+% X = [1, 2, 3, 4, 5],
+% Y = [3, 4, 5, 6, 7, 8],
+% Z = [1, 2] .
+
 % 14.To determine symmetric difference of two sets.
 %% set_symmetric_difference(S1, S2, Res) 
 % Res is the symmetric_difference of S1 and S2
@@ -201,10 +250,25 @@ set_symmetric_difference(S1, S2, Res):-
     set_intersection(S1, S2, S1_intersection_S2),
     set_difference(S1_union_S2, S1_intersection_S2, Res).
 
+% ?- set_symmetric_difference([1,2,3], [2,1], X).
+% X = [3] .
+
+% ?- range(1,5, X), range(3, 8, Y), set_symmetric_difference(X, Y, Z).
+% X = [1, 2, 3, 4, 5],
+% Y = [3, 4, 5, 6, 7, 8],
+% Z = [1, 2, 6, 7, 8] .
+
 % 15. To find the last but one element of a list.
 % last_but_one(L, X) -> X is the last but one element of list L
 last_but_one(L, X):-
     append_two_list(_, [X|[_]], L).
+
+% ?- last_but_one([a,b,c,d], X).
+% X = c .
+
+% ?- range(1, 100, X), last_but_one(X, Y).
+% X = [1, 2, 3, 4, 5, 6, 7, 8, 9|...],
+% Y = 99 .
 
 % 16. To find the K'th element of a list.
 % The first element in the list is number 1.
@@ -214,6 +278,13 @@ element_at(X, [X|_], 1).
 element_at(X, [_|L], N):-
     N_minus_1 is N - 1,
     element_at(X, L, N_minus_1).
+
+% ?- element_at(X, [1,4,5,3], 3).
+% X = 5 .
+
+% ?- range(1, 100, X), element_at(Y, X, 64).
+% X = [1, 2, 3, 4, 5, 6, 7, 8, 9|...],
+% Y = 64 .
 
 % 17. To replace n th element by another element X in L, 
 % leaving the resultant list in L1.
@@ -233,6 +304,12 @@ replace_n_loop([A|Rest], N, X, [A|L2],Curr):-
 replace_n(L, N, X, L1):- 
     replace_n_loop(L, N, X, L1,1).
 
+% ?- replace_n([a,b,c,d,e], 2, 2, X).
+% X = [a, 2, c, 2, e].
+
+% ?- replace_n([a,b,c,d,e], 3, 100, X).
+% X = [a, b, 100, d, e].
+
 % 18. to remove every N'th element from a list.
 % remove_n(L, N, L1) -> L1 will have elements of L but every 
 % nth element removed
@@ -249,6 +326,13 @@ remove_n_loop([A|Rest], N, [A|L2],Curr):-
 
 remove_n(L, N, L1):-
     remove_n_loop(L,N, L1, 1).
+
+% ?- remove_n([1,2,3,4,5], 2, X).
+% X = [1, 3, 5].
+
+% ?- range(2,11, L), remove_n(L, 2, X).
+% L = [2, 3, 4, 5, 6, 7, 8, 9, 10|...],
+% X = [2, 4, 6, 8, 10] .
 
 % 19. Interleave alternate elements of L1 and L2 into L. 
 % For example, if L1= [a, b, c] and L2= [1, 2], then L= [a, 1, b, 2, c].
@@ -267,6 +351,12 @@ interleave_two_list_loop([X|L1], [Y|L2], [Y|L3],1):-
 interleave_two_list(L1, L2, Res):-
     interleave_two_list_loop(L1, L2, Res, 0).
 
+% ?- interleave_two_list([a,b,c], [1,2], X).
+% X = [a, 1, b, 2, c] .
+
+% ?- interleave_two_list([a,b,c], [1,2,3,4,5,6], X).
+% X = [a, 1, b, 2, c, 3, 4, 5, 6] .
+
 %20.Transpose L1, L2 into L. That is, if L1= [a, b, c] and 
 % L2= [1, 2, 3], then L= [(a, 1), (b, 2), (c,3)].
 
@@ -277,6 +367,12 @@ transpose_two_list([A|L1], [B|L2], [(A, B)|Rest]):-
     list_len(L1, X),
     list_len(L2, X),
     transpose_two_list(L1, L2, Rest).
+
+% ?- transpose_two_list([a,b,c], [1,2,3], X).
+% X = [(a, 1),  (b, 2),  (c, 3)].
+
+% ?- transpose_two_list([a,b,c], [1,2,3,4], X).
+% false.
 
 % 21. To split a list into two parts; the length of the first part is given.
 % Do not use any predefined predicates.
@@ -294,6 +390,15 @@ split_two_parts([X|L], N, [X|Left], Right):-
     N_minus_1 is N - 1,
     split_two_parts(L, N_minus_1, Left, Right).
 
+% ?- split_two_parts([1,2,3,4,5], 3, X, Y).
+% X = [1, 2, 3],
+% Y = [4, 5] .
+
+% ?- range(1,1000,L), split_two_parts(L, 500, X, Y).
+% L = [1, 2, 3, 4, 5, 6, 7, 8, 9|...],
+% X = [1, 2, 3, 4, 5, 6, 7, 8, 9|...],
+% Y = [501, 502, 503, 504, 505, 506, 507, 508, 509|...] .
+
 % 22. To extract a slice from a list.
 % Given two indices, I and K, the slice is the list containing 
 % the elements between the I'th and K'th element of the 
@@ -310,6 +415,13 @@ slice(L1, LeftStart, RightEnd, Res):-
     ResLen is RightEnd - LeftStart + 1,
     split_two_parts(Res_plus_extra, ResLen, Res, _).
 
+% ?- slice([a,b,c,d,e,f,g,h,i,k],3,7,L).
+% L = [c, d, e, f, g] .
+
+% ?- range(1,1000,L), slice(L, 500, 505, X).
+% L = [1, 2, 3, 4, 5, 6, 7, 8, 9|...],
+% X = [500, 501, 502, 503, 504, 505] .
+
 % 23. To insert an element at a given position into a list.
 % Example:
 % ?- insert_at(alfa,[a,b,c,d],2,L).
@@ -321,6 +433,12 @@ insert_at(X, [Head|Tail], 1, [X|[Head|Tail]]).
 insert_at(X, [Head|Tail], N, [Head|Res]):-
     N_minus_1 is N - 1,
     insert_at(X, Tail, N_minus_1, Res).
+
+% ?- insert_at(alfa,[a,b,c,d],2,L).
+% L = [a, alfa, b, c, d] .
+
+% ?- insert_at(alfa,[a,b,c,d,3,f],5,L).
+% L = [a, b, c, d, alfa, 3, f] .
 
 % 24. To remove_every_other (L, L1). List L1 is just list L 
 % with every other element removed
@@ -338,11 +456,23 @@ remove_every_other_loop([], [], _).
 remove_every_other(L, L1):-
     remove_every_other_loop(L, L1, 0).
 
+% ?- remove_every_other([1,2,3,4,5], X).
+% X = [1, 3, 5] .
+
+% ?- range(1, 1000000, L), remove_every_other(L, X).
+% L = [1, 2, 3, 4, 5, 6, 7, 8, 9|...],
+% X = [1, 3, 5, 7, 9, 11, 13, 15, 17|...] .
 
 % 25. cutlast (L, L1) that defines L1 to be obtained from L 
 % with last element removed.
 cutlast(L, L1):-
     append_two_list(L1, [_], L).
+
+% ?- cutlast([1,2,3,4,5], X).
+% X = [1, 2, 3, 4] .
+
+% ?- cutlast([a,b,c], X).
+% X = [a, b] .
 
 % 26. trim (N, L, L1) that defines L1 to be obtained from L 
 % with first N elements removed
@@ -350,11 +480,25 @@ trim(N, L, L1):-
     append_two_list(LeftExtra, L1, L),
     list_len(LeftExtra, N).
 
+% ?- trim(3, [1,2,3,4,5], X).
+% X = [4, 5] .
+
+% ?- range(2, 12, L), trim(5, L, X).
+% L = [2, 3, 4, 5, 6, 7, 8, 9, 10|...],
+% X = [7, 8, 9, 10, 11, 12] .
+
 % 27.trimlast (N, L, L1) that defines L1 to be obtained from 
 % L with last N elements removed.
 trimlast(N, L, L1):-
     append_two_list(L1, RightExtra, L),
     list_len(RightExtra, N).
+
+% ?- trimlast(3, [1,2,3,4,5], X).
+% X = [1, 2] .
+
+% ?- range(2, 12, L), trimlast(5, L, X).
+% L = [2, 3, 4, 5, 6, 7, 8, 9, 10|...],
+% X = [2, 3, 4, 5, 6, 7] .
 
 % 28.exchange_first_last(L, L1), defines that L1 to be obtained 
 % from L with first and last elements exchanged.
@@ -365,10 +509,22 @@ exchange_first_last([X|T], [Y|L1]):-
     append_two_list(Rest, [Y], T),
     append_two_list(Rest, [X], L1).
 
+% ?- exchange_first_last([a, b, c, d, e], X).
+% X = [e, b, c, d, a] .
+
+% ?- exchange_first_last([1,2,3], X).
+% X = [3, 2, 1] .
+
 % 29 circular_left_shift(L, L1). That is, if L= [a, b, c, d, e, f] 
 % then L1= [b, c, d, e, f, a]
 circular_left_shift([X|L], L1):-
     append_two_list(L, [X], L1).
+
+% ?- circular_left_shift([a,b,c,d,e,f], X).
+% X = [b, c, d, e, f, a].
+
+% ?- circular_left_shift([a], X).
+% X = [a].
 
 % 30. circular_right_shift(L, L1). That is, if L= [a, b, c, d, e, f] 
 % then L1= [f, a, b, c, d, e]
@@ -376,17 +532,23 @@ circular_right_shift(L, [Y|L1]):-
     append_two_list(L1, [Y], L).
 
 % [Try using circular_left_shift in 30 to implement circular_right_shift.]
-circular_right_shift_2_loop(L, L, 0).
+circular_right_shift_1_loop(L, L, 0).
 
-circular_right_shift_2_loop(L, L1, Curr):-
+circular_right_shift_1_loop(L, L1, Curr):-
     circular_left_shift(L, L2),
     Curr_minus_1 is Curr - 1,
-    circular_right_shift_2_loop(L2, L1, Curr_minus_1).
+    circular_right_shift_1_loop(L2, L1, Curr_minus_1).
 
 circular_right_shift_1(L, L1):-
     list_len(L, L_len),
     L_len_minus_1 is L_len - 1,
-    circular_right_shift_2_loop(L, L1, L_len_minus_1).
+    circular_right_shift_1_loop(L, L1, L_len_minus_1).
+
+% ?- circular_right_shift_1([a,b,c,d,e,f], X).
+% X = [f, a, b, c, d, e] .
+
+% ?- circular_right_shift_1([a,b], X).
+% X = [b, a] .
 
 % 31.To delete the middle element from an odd-numbered list 
 % L into a list L1.
@@ -405,6 +567,12 @@ delete_middle_element_odd_length(L, L1):-
     MiddleIndex is (L_len-1)/2,
     delete_middle_element_odd_length_loop(L, L1, MiddleIndex).
 
+% ?- delete_middle_element_odd_length([1,2,3,4,5], X).
+% X = [1, 2, 4, 5] .
+
+% ?- delete_middle_element_odd_length([1], X).
+% X = [] .
+
 % 32.To delete two middle elements from an even-numbered list 
 % L into a list L1.
 
@@ -420,3 +588,9 @@ delete_middle_element_even_length_loop([_|[_|T]], T, 0).
 delete_middle_element_even_length_loop([H|T], [H|L1], MiddleIndex):-
     MiddleIndex_minus_1 is MiddleIndex - 1,
     delete_middle_element_even_length_loop(T, L1, MiddleIndex_minus_1).
+
+% ?- delete_middle_element_even_length([1,2,3,4], X).
+% X = [1, 4] .
+
+% ?- delete_middle_element_even_length([2,3], X).
+% X = [] .
