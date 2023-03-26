@@ -114,14 +114,14 @@ combination_loop(ResLen, [_|T], Res, SelectedElem):-
 combination(ResLen, L, Res):-
     combination_loop(ResLen, L, Res, []).
 
-    ?- combination(1,[a,b,c,d,e,f],L).
-L = [a] ;
-L = [b] ;
-L = [c] ;
-L = [d] ;
-L = [e] ;
-L = [f] ;
-false.
+% ?- combination(1,[a,b,c,d,e,f],L).
+% L = [a] ;
+% L = [b] ;
+% L = [c] ;
+% L = [d] ;
+% L = [e] ;
+% L = [f] ;
+% false.
 
 % ?- combination(3,[a,b,c,d,e,f],L).
 % L = [a, b, c] ;
@@ -154,3 +154,92 @@ false.
 % L = [a, c, d, e, f] ;
 % L = [b, c, d, e, f] ;
 % false.
+
+% 5. Implement Permutation Sort.
+
+% is_ascending(L) -> give true if L is sorted in ascending order
+is_ascending([]).
+is_ascending([_]).
+is_ascending([X|[Y|Rest]]):-
+    X =< Y,
+    is_ascending([Y|Rest]).
+
+permutation_sort(L, Res):-
+    permutation(L, Res),
+    is_ascending(Res).
+
+% ?- permutation_sort([3,2,1,4],X).
+% X = [1, 2, 3, 4] .
+
+% ?- permutation_sort([3,2,1,4,3],X).
+% X = [1, 2, 3, 3, 4] .
+
+% 6. Implement Bubble Sort.
+
+bubblesort_swap([X|[Y|T1]],[Y|[X|T1]]):-
+    Y<X,!.
+
+bubblesort_swap([X|T1],[X|T2]):- 
+    bubblesort_swap(T1,T2).
+
+bubblesort(List, SortedList) :-
+    bubblesort_swap(List, List1), !,
+    bubblesort(List1, SortedList).
+
+bubblesort(List, List).
+
+% ?- bubblesort([1,2,3,1], X).
+% X = [1, 1, 2, 3].
+
+% ?- bubblesort([1,2,3,1,5,2], X).
+% X = [1, 1, 2, 2, 3, 5].
+
+% 7. Implement Selection Sort.
+
+% selection_smaller(X, L) -> true if X is smaller than every elem of L
+selection_smaller(_, []).
+selection_smaller(X, [H|T]):-
+    X =< H,
+    selection_smaller(X, T).
+
+% selection_least(X, L, R) -> select the least elem X from L, remaining elem in R
+selection_least(_, [], []).
+
+selection_least(X, L, R):-
+    select(X, L, R),
+    selection_smaller(X, R).
+
+selection_sort([],[]).
+selection_sort(L, [H|T]):-
+    selection_least(H, L, R),
+    selection_sort(R, T).
+
+% ?- selection_sort([1,2,3,1,5,2], X).
+% X = [1, 1, 2, 2, 3, 5] .
+
+% ?- selection_sort([1,2,3,1,5,2, 100, 1], X).
+% X = [1, 1, 1, 2, 2, 3, 5, 100] .
+
+% 8. Implement Insertion Sort.
+
+% insertion_insert(X, L, Res) -> insert X in L for such that the resultant list R is sorted
+insertion_insert(X, [], [X]).
+
+insertion_insert(X, [H|T], [X|[H|T]]):-
+    X =< H, !.
+
+insertion_insert(X, [H|T], [H|T1]):-
+    X > H,
+    insertion_insert(X, T, T1).
+
+insertion_sort([], []).
+
+insertion_sort([H|T], L):-
+    insertion_sort(T, L1),
+    insertion_insert(H, L1, L).
+
+% ?- insertion_sort([5,3,2,4,1], Res).
+% Res = [1, 2, 3, 4, 5] .
+
+% ?- insertion_sort([5,3,100,2,4,1], Res).
+% Res = [1, 2, 3, 4, 5, 100] .
