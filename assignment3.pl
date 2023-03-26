@@ -377,7 +377,7 @@ tower_of_hanoi_recur([LTop|L], [], [], H):-
 tower_of_hanoi_recur([LTop|L], [], [], H):-
     tower_of_hanoi_recur(L, [], [LTop], [([LTop|L], [], [])|H]).
 
-% CASE 2: only in right (end case)
+% CASE 2: only in middle (end case)
 tower_of_hanoi_recur([], M, [], H):-
     reverse_list([([], M, [])|H], H_rev),
     tower_of_hanoi_print_res(H_rev).
