@@ -243,3 +243,99 @@ insertion_sort([H|T], L):-
 
 % ?- insertion_sort([5,3,100,2,4,1], Res).
 % Res = [1, 2, 3, 4, 5, 100] .
+
+% 9. Implement Merge Sort.
+
+% merge_sort_divide(L, L1, L2) -> divide L into near equal length list L1 and L2
+merge_sort_divide([], [], []).
+
+merge_sort_divide([X], [X], []).
+
+merge_sort_divide([X|[Y|T]], [X|L1], [Y|L2]):-
+    merge_sort_divide(T, L1, L2).
+
+% merge_sort_merge(L1, L2, Res) -> merge L1 and L2 in Res such that Res is sorted
+% NOTE: L1 and L2 re also sorted input
+merge_sort_merge([],[],[]).
+
+merge_sort_merge([X|Rest], [], [X|Rest]).
+
+merge_sort_merge([], [Y|Rest], [Y|Rest]).
+
+merge_sort_merge([X|L1], [Y|L2], [X|L3]):-
+    X < Y, !,
+    merge_sort_merge(L1, [Y|L2], L3).
+
+merge_sort_merge([X|L1], [Y|L2], [Y|L3]):-
+    X > Y, !,
+    merge_sort_merge([X|L1], L2, L3).
+
+merge_sort_merge([X|L1], [Y|L2], [X|[Y|L3]]):-
+    X = Y, 
+    merge_sort_merge(L1, L2, L3).
+
+merge_sort([], []).
+
+merge_sort([X], [X]).
+
+merge_sort(L, M):-
+    merge_sort_divide(L, L1, L2),
+    merge_sort(L1, L1Sorted),
+    merge_sort(L2, L2Sorted),
+    merge_sort_merge(L1Sorted, L2Sorted, M).
+
+% ?- merge_sort([2,1], X).
+% X = [1, 2] .
+
+% ?- merge_sort([1,6,2,9,3,1], X).
+% X = [1, 1, 2, 3, 6, 9] .
+
+% 10. Implement Quick Sort using Accumulator.
+
+% quick_sort_partition(T, Lt, H, Gt) -> partition T into Lt, H, Gt 
+% where H is the first elem of T, Lt is the list of elem less than H
+% and Gt is the lis tof elem greater than H
+quick_sort_partition([], [], _, []).
+
+quick_sort_partition([X|T], [X|TLt], H, Gt):-
+    X =< H, !,
+    quick_sort_partition(T, TLt, H, Gt).
+
+quick_sort_partition([X|T], Lt, H, [X|TGt]):-
+    X > H,
+    quick_sort_partition(T, Lt, H, TGt).
+
+quick_sort_acc([], A, A).
+
+quick_sort_acc([H|T], A, L1):-
+    quick_sort_partition(T, Lt, H, Gt),
+    quick_sort_acc(Gt, A, GtSorted),
+    quick_sort_acc(Lt, [H|GtSorted], L1).
+
+quick_sort(L, L1):-
+    quick_sort_acc(L, [], L1).
+
+% ?- quick_sort([1,2,3,6,4], X).
+% X = [1, 2, 3, 4, 6].
+
+% ?- quick_sort([1,2,3, 89, 3, 8, 2], X).
+% X = [1, 2, 2, 3, 3, 8, 89].
+
+% 11. Implement Quick Sort without Accumulator.
+
+quick_sort_no_acc([], []).
+
+quick_sort_no_acc([X], [X]).
+
+quick_sort_no_acc([H|T], L1):-
+    quick_sort_partition(T, Lt, H, Gt),
+    quick_sort_no_acc(Lt, LtSorted),
+    quick_sort_no_acc(Gt, GtSorted),
+    append_two_list(LtSorted, [H], Temp),
+    append_two_list(Temp, GtSorted, L1).
+
+% ?- quick_sort_no_acc([1,2,3,7,34,5], X).
+% X = [1, 2, 3, 5, 7, 34] .
+
+% ?- quick_sort_no_acc([1,2,3,7,34,5,2], X).
+% X = [1, 2, 2, 3, 5, 7, 34] .
