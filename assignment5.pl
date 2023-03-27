@@ -339,3 +339,104 @@ quick_sort_no_acc([H|T], L1):-
 
 % ?- quick_sort_no_acc([1,2,3,7,34,5,2], X).
 % X = [1, 2, 2, 3, 5, 7, 34] .
+
+% 12. Eliminate consecutive duplicates of list elements.
+% If a list contains repeated elements they should be replaced with a single copy
+% of the element. The order of the elements should not be changed.
+compress([X], [X]).
+
+compress([X|[X|R]], Res):-
+    compress([X|R], Res).
+
+compress([X|[Y|R]], [X|Res]):-
+    compress([Y|R], Res).
+
+% ?- compress([a,a,a,a,b,c,c,a,a,d,e,e,e,e],X).
+% X = [a, b, c, a, d, e] .
+
+% ?- compress([a,a,a,a,b,c,c,a,a,d,e,e,e,e,f,f,f,f],X).
+% X = [a, b, c, a, d, e, f] .
+
+% 13. Run-length encoding of a list.
+% Use the result of problem P14 to implement the so-called run-length encoding
+% data compression method. Consecutive duplicates of elements are encoded as
+% terms [N,E] where N is the number of duplicates of the element E.
+
+encode_loop([X], [X], Count, [[Count_plus_1, X]]):-
+    Count_plus_1 is Count + 1.
+
+encode_loop([X|L], [Y|LCompress], Count, [[Count,Y]|Res]):- 
+    encode_loop([X|L], LCompress, 0, Res).
+
+encode_loop([X|L], [X|LCompress], Count, Res):-
+    Count_plus_1 is Count + 1,
+    encode_loop(L, [X|LCompress], Count_plus_1, Res).
+
+encode(L, Res):-
+    compress(L, LCompress),
+    encode_loop(L, LCompress, 0, Res).
+
+% ?- encode([a,a,a,a,b,c,c,a,a,d,e,e,e,e],X).
+% X = [[4, a], [1, b], [2, c], [2, a], [1, d], [4, e]] .
+
+% ?- encode([a,a,a,a,b,c,c,a,a,d,e,e,e,e, f, f, f],X).
+% X = [[4, a], [1, b], [2, c], [2, a], [1, d], [4, e], [3, f]] .
+
+% 14. Modified run-length encoding.
+% Modify the result of problem P15 in such a way that if an element has no
+% duplicates it is simply copied into the result list. Only elements with duplicates
+% are transferred as [N,E] terms.
+
+encode_modified_loop([[1, X]], [X]).
+
+encode_modified_loop([X], [X]).
+
+encode_modified_loop([[1, X]|Rest], [X|L]):-
+    encode_modified_loop(Rest, L).
+
+encode_modified_loop([X|Rest], [X|L]):-
+    encode_modified_loop(Rest, L).
+
+encode_modified(L, Res):-
+    encode(L, LEncoded),
+    encode_modified_loop(LEncoded, Res).
+
+% ?- encode_modified([a,a,a,a,b,c,c,a,a,d,e,e,e,e],X).
+% [[4,a],[1,b],[2,c],[2,a],[1,d],[4,e]]
+% X = [[4, a], b, [2, c], [2, a], d, [4, e]] .
+
+% ?- encode_modified([a,a,a,a,b,c,c,a,a,d,e,e,e,e,f],X).
+% [[4,a],[1,b],[2,c],[2,a],[1,d],[4,e],[1,f]]
+% X = [[4, a], b, [2, c], [2, a], d, [4, e], f] .
+
+% 15. Decode a run-length encoded list.
+% Given a run-length code list generated as specified in problem P16. Construct
+% its uncompressed version.
+
+% not working
+% decode_modified(L, Res):-
+%     encode_modified(Res, L).
+
+gen_num(X, 1, [X]).
+gen_num(X, Num, [X|L1]):-
+    Num_minus_1 is Num - 1,
+    gen_num(X, Num_minus_1, L1).
+
+decode_modified([[Num, X]], Res):-
+    gen_num(X, Num, Res).
+
+decode_modified([X], [X]).
+
+decode_modified([[Num, X]|L], Res):-
+    gen_num(X, Num, ResLeft),
+    decode_modified(L, ResRight),
+    append_two_list(ResLeft, ResRight, Res).
+
+decode_modified([X|L], [X|L1]):-
+        decode_modified(L, L1).
+
+% ?- decode_modified([[2, a], b, [2, c], [2, a],  f], X).
+% X = [a, a, b, c, c, a, a, f] .
+
+% ?- decode_modified([[2,a], b, [3,c]], X).
+% X = [a, a, b, c, c, c] .
