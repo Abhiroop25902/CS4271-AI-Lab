@@ -245,4 +245,103 @@ resolution_refutation(List):-
 
 % ?- resolution_refutation([[x], [y]]).
 % false.
+
+% 5. Write a PROLOG program to implement Unification Algorithm.
+% Inputs: Two predicates to be unified.
+% Outputs: [1] Whether Unification is possible.
+% [2] If [1] possible: Result of Unification along with set of substitutions
+% that led to the Result.
+
+% apply all substitutions to all terms to get the substituted terms
+apply([],Terms,Terms).
+apply([S|R],Terms,FTerms):-
+    apply_to_all(S,Terms,STerms),
+    apply(R,STerms,FTerms).
+
+% apply a single substitution to all terms to get substituted terms
+apply_to_all(_,[],[]).
+% here in X=Y, = is a character
+apply_to_all(X=Y,[T|R],[ST|SR]):-
+    apply_recursively(X=Y,T,ST),
+    apply_to_all(X=Y,R,SR).
+
+% Apply a single substitution to a single term to get subtituted term
+% here in X=Y, = is a character
+apply_recursively(X=_,V,V):-
+    var(V),
+    not(X == V),!.
+apply_recursively(X=Y,V,Y):-
+    var(V),
+    X == V,!.
+apply_recursively(_,V,V):-
+    not(compound(V)).
+apply_recursively(S,[T|R],[ST|SR]):-
+    apply_recursively(S,T,ST),
+    apply_recursively(S,R,SR).
+apply_recursively(S,C,SC):-
+    compound(C),
+    not(is_list(C)),
+    C =.. [F|Args],
+    apply_recursively(S,Args,SArgs),
+    SC =.. [F|SArgs].
+
+% The “==” operator differs in that it succeeds only if the 
+% two terms are already identical without further unification1.
+unify(X,Y,[]):-
+    X == Y,!.
+% here = is a character
+unify(X,Y,[X=Y]):-
+    var(X),!.
+unify(X,Y,[Y=X]):-
+    var(Y),!.
+
+unify([X|RX],[Y|RY],S):-
+    unify(X,Y,SF),
+    apply(SF,RX,SRX),
+    apply(SF,RY,SRY),
+    unify(SRX,SRY,SR),
+    apply(SR,SF,SSF),
+    append(SSF,SR,S),!.
+
+unify(X,Y,S):-
+    not(is_list(X)),
+    not(is_list(Y)),
+    compound(X), % is X is a functor call
+    compound(Y),
+    X =.. [XF|XArgs], % X is the param list of the compound functor call
+    Y =.. [YF|YArgs],
+    unify(XF,YF,SF),
+    unify(XArgs,YArgs,SArgs),
+    append(SF,SArgs,S).
+
+% ?- unify([A, b],[f(b), C], S).
+% S = [A=f(b), C=b].
+
+% ?- unify([A],[B], S).
+% S = [A=B].
+
+% ?- unify([A],[A], S).
+% S = [].
+
+% ?- unify([a],[A], S).
+% S = [A=a].
+
+% ?- unify([A, b, c],[f(b), C], S).
+% false.
+
+% ?- unify(f(A),f(c), S).
+% S = [A=c].
+
+% 6. Write a PROLOG program to implement Resolution-Refutation for First Order
+% Predicate Logic (FOPL) combining Problem 4 and Problem 5 for the purpose of
+% Automated Reasoning. (35)
+
+% code for problem 4 is working for FOPL also because of prolog built in unification
+
+% ?- resolution_refutation([[not s(X), c(X)], [s(b)], [v(a, b)], [not c(Z), not v(a, Z)]]).
+% solution:resolve(clause([s(b),(not c(b)),(not v(a,b))],resolve(clause([s(b)],none),clause([(not c(b)),(not v(a,b))],none))),clause([(not s(b)),c(b),v(a,b)],resolve(clause([(not s(b)),c(b)],none),clause([v(a,b)],none))))
+% X = Z, Z = b .
+
+% ?- resolution_refutation([[not s(X), c(X)], [s(b)]]).
+% false.
    
