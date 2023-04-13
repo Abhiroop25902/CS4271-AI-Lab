@@ -1,3 +1,23 @@
+/**
+ *
+ * is_member/2 predicate returns true if X is a member of list L
+ *  
+ * @param X the element to search
+ * @param L the list to search in  */
+is_member(X, [X]).
+is_member(X, [X | _]).
+is_member(X, [_ | Rest]):-
+    is_member(X, Rest).
+
+%% set_union(S1, S2, Res) 
+% Res is the union of Set S1 and S2
+set_union([], S, S).
+set_union([X|S1], S2, S3):-
+    is_member(X, S2), !,
+    set_union(S1, S2, S3).
+set_union([X|S1], S2, [X|S3]):-
+    set_union(S1, S2, S3).
+
 % 1. Truth tables for logical expressions (1).
 % Define predicates and/2, or/2, nand/2, nor/2, xor/2, impl/2 and equ/2 (for
 % logical equivalence) which succeed or fail according to the result of their
@@ -134,3 +154,95 @@ table(L,E) :-
 % false    false   true    true
 % false    false   false   true
 % false.
+
+% 4. Write a PROLOG program for automated reasoning in Propositional Logic (PL)
+% using Resolution-Refutation.
+% Inputs: Sets of Axioms and Negation of Conclusion in Clause Form.
+% Outputs: [1] (Conclusion is) True or False, i. e. , conclusion is derivable from the
+% given sets of axioms.
+% [2] The path through which the conclusion is found to be True , if it is
+% valid.
+
+% we create our clause structure as: clause(List, resolve(clauseX, clause))
+% where List is the list of propositions (atoms) in the clause, and this 
+% clause is obtained by resolving % two other clauses clauseX and clauseY.
+% If clause is given as axiom, the second argument of our
+% clause(arg1, arg2) structure is ‘none’.
+create_clauses([],[]).
+create_clauses([X|R],[clause(X,none)|RClauses]):-
+    create_clauses(R,RClauses).
+
+% negate all elements in the clause list
+negation([],[]).
+negation([not X|R],[X|NR]):-
+    !,
+    negation(R,NR).
+negation([X|R],[not X|NR]):-
+    negation(R,NR).
+
+% resolve_pair(clause1, clause2, resolved_pair)
+resolve_pair(
+    clause(X,XPath),clause(Y,YPath),
+    clause(Z,resolve(clause(X,XPath),clause(Y,YPath)))
+):-
+    negation(X,NX),
+    negation(Y,NY),
+    subtract(X,NY,CX),
+    subtract(Y,NX,CY),
+    union(CX,CY,Z).
+
+% is X already present in Y?
+is_present(clause(X,_),[clause(X,_)|_]):-!.
+is_present(clause(X,P),[clause(_,_)|R]):-
+    is_present(clause(X,P),R).
+
+% resolve(C, Rem, Res) -> resolve C with all clauses of Rem and give them in Res
+resolve(_,[],[]).
+resolve(C,[X|R],RList):-
+    resolve_pair(C,X,NC),
+    resolve(C,R,NR),
+    set_union([NC],NR,RList).
+
+% generate new clause resolving a pair with each other
+generate_clauses([],[]).
+generate_clauses([Clause|R],NewClauses):-
+    generate_clauses(R,NClauses),
+    resolve(Clause,R,RClauses),
+    set_union(NClauses,RClauses,NewClauses).
+
+% end case
+is_solved([clause([],Path)|_]):-
+    write(solution:Path),!.
+is_solved([clause(_,_)|R]):-
+    is_solved(R).
+
+% is_subset code but for clause
+is_subset([],_).
+is_subset([X|P],Q):-
+    is_subset(P,Q),
+    is_present(X,Q).
+
+solve(Clauses):-
+    generate_clauses(Clauses,NewClauses),
+    is_solved(NewClauses),!.
+solve(Clauses):-
+    generate_clauses(Clauses,NewClauses),
+    is_subset(NewClauses,Clauses),!,
+    fail.
+solve(Clauses):-
+    generate_clauses(Clauses,NewClauses),
+    set_union(NewClauses,Clauses,Combined),
+    solve(Combined).
+   
+
+resolution_refutation(List):-
+    create_clauses(List,Clauses),
+    solve(Clauses).
+
+% ?- resolution_refutation([[x, not y, not z], [y], [z], [not x]]).
+% solution:resolve(clause([y,(not x)],resolve(clause([y],none),clause([(not x)],none))),clause([x,(not y)],resolve(clause([x,(not y),(not z)],none),clause([z],none))))
+% true .
+
+% ?- resolution_refutation([[x], [y]]).
+% false.
+   
